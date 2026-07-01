@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Korean Test :: Слова</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #14181c;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
+        }
+
+        .app-container {
+            max-width: 480px;
+            width: 100%;
+            background-color: #1a1f24;
+            border-radius: 32px;
+            padding: 24px 20px 28px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid #2b3138;
+            transition: all 0.1s ease;
+        }
+
+        /* заголовок */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2b3138;
+        }
+
+        .app-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f7c948;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .app-header h1 span {
+            background-color: #f7c94820;
+            padding: 0 10px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #e0b84a;
+        }
+
+        .stats-badge {
+            background: #1f262c;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 14px;
+            color: #cfd7df;
+            border: 1px solid #2f373e;
+            display: flex;
+            gap: 12px;
+        }
+
+        .stats-badge span {
+            font-weight: 500;
+        }
+
+        .stats-badge .correct-stat {
+            color: #8bc34a;
+        }
+        .stats-badge .wrong-stat {
+            color: #ef7a7a;
+        }
+
+        /* карточка слова */
+        .word-card {
+            background: #1e252b;
+            border-radius: 28px;
+            padding: 32px 18px 28px;
+            margin: 8px 0 22px;
+            border: 1px solid #2d353d;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .translation {
+            font-size: 28px;
+            font-weight: 500;
+            color: #f0f4f8;
+            margin-bottom: 18px;
+            letter-spacing: 0.3px;
+            word-break: break-word;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .translation::before {
+            content: "🇰🇷  ";
+            font-size: 22px;
+            opacity: 0.7;
+        }
+
+        .input-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+
+        #koreanInput {
+            flex: 1;
+            background: #0f1317;
+            border: 1px solid #333d46;
+            border-radius: 60px;
+            padding: 14px 20px;
+            font-size: 20px;
+            color: #eef3f7;
+            outline: none;
+            transition: 0.2s;
+            letter-spacing: 1px;
+            min-width: 0;
+        }
+
+        #koreanInput:focus {
+            border-color: #f7c948;
+            box-shadow: 0 0 0 3px #f7c94830;
+            background: #12181d;
+        }
+
+        #koreanInput::placeholder {
+            color: #6b7a88;
+            font-size: 16px;
+            letter-spacing: 0;
+            opacity: 0.7;
+        }
+
+        .btn-primary {
+            background: #f7c948;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 22px;
+            font-weight: 600;
+            font-size: 16px;
+            color: #14181c;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: 0 4px 10px rgba(247, 201, 72, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95);
+            background: #e0b83a;
+        }
+
+        .btn-secondary {
+            background: #2c353e;
+            border: 1px solid #3d4853;
+            border-radius: 60px;
+            padding: 14px 18px;
+            font-weight: 500;
+            font-size: 15px;
+            color: #cbd5df;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:active {
+            background: #3b4651;
+            transform: scale(0.95);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            justify-content: flex-end;
+        }
+
+        .action-row .btn-secondary {
+            flex: 1;
+        }
+
+        /* feedback */
+        .feedback {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            transition: 0.15s;
+            background: #1a2127;
+            border: 1px solid #2b343d;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            color: #e0e8ef;
+        }
+
+        .feedback.correct {
+            background: #1e3a2a;
+            border-color: #5b8c4a;
+            color: #b5e6a0;
+        }
+
+        .feedback.wrong {
+            background: #3d262a;
+            border-color: #b15a5a;
+            color: #f5b5b5;
+        }
+
+        .feedback .hint-letter {
+            background: #2d3943;
+            padding: 2px 14px;
+            border-radius: 40px;
+            font-size: 22px;
+            font-weight: 400;
+            color: #f7c948;
+            margin-left: 6px;
+        }
+
+        .progress-text {
+            color: #8f9ea8;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            border-top: 1px solid #253037;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reset-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .reset-btn {
+            background: none;
+            border: none;
+            color: #6f7e8b;
+            font-size: 13px;
+            text-decoration: underline dotted;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 30px;
+        }
+
+        .reset-btn:active {
+            color: #f7c948;
+            background: #1f282f;
+        }
+
+        /* responsive */
+        @media (max-width: 440px) {
+            .app-container {
+                padding: 18px 14px 22px;
+            }
+            .translation {
+                font-size: 24px;
+            }
+            #koreanInput {
+                font-size: 18px;
+                padding: 12px 16px;
+            }
+            .btn-primary {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            .btn-secondary {
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+            .stats-badge {
+                font-size: 12px;
+                padding: 4px 10px;
+                gap: 8px;
+            }
+            .feedback {
+                font-size: 16px;
+                padding: 10px 12px;
+                min-height: 50px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .input-row {
+                flex-wrap: wrap;
+            }
+            .btn-primary {
+                width: 100%;
+            }
+        }
+
+        /* скрытые */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container" id="app">
+    <div class="app-header">
+        <h1>📝 Тест <span>🇰🇷</span></h1>
+        <div class="stats-badge">
+            <span class="correct-stat">✅ <span id="correctCount">0</span></span>
+            <span class="wrong-stat">❌ <span id="wrongCount">0</span></span>
+        </div>
+    </div>
+
+    <!-- карточка -->
+    <div class="word-card">
+        <div class="translation" id="translationDisplay">Загрузка...</div>
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="koreanInput" placeholder="Введите слово на корейском" autocomplete="off" autofocus>
+                <button class="btn-primary" id="checkBtn">Проверить</button>
+            </div>
+            <div class="action-row">
+                <button class="btn-secondary" id="skipBtn">⏭ Пропустить</button>
+                <button class="btn-secondary" id="nextBtn" style="background: #2b353f; border-color: #f7c94860;">➡ Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- фидбек -->
+    <div class="feedback" id="feedbackArea">
+        ✨ Введите слово и нажмите Проверить
+    </div>
+
+    <!-- прогресс + сброс -->
+    <div class="progress-text">
+        <span id="progressIndex">0 / 0</span>
+        <span id="remainingWords">📚 осталось: 0</span>
+    </div>
+    <div class="reset-area">
+        <button class="reset-btn" id="resetBtn">⟳ Сбросить статистику</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- firebase url -----
+        const FIREBASE_URL = 'https://korean-cards-3ea38-default-rtdb.firebaseio.com/words.json';
+
+        // ----- DOM refs -----
+        const translationDisplay = document.getElementById('translationDisplay');
+        const koreanInput = document.getElementById('koreanInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const feedbackArea = document.getElementById('feedbackArea');
+        const correctSpan = document.getElementById('correctCount');
+        const wrongSpan = document.getElementById('wrongCount');
+        const progressIndex = document.getElementById('progressIndex');
+        const remainingWordsSpan = document.getElementById('remainingWords');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // ----- state -----
+        let allWords = [];              // [{ id, russian, korean }]
+        let shuffledWords = [];         // перемешанные
+        let currentIndex = 0;           // индекс в shuffledWords
+        let stats = { correct: 0, wrong: 0 };
+        let isAnswered = false;         // флаг: уже отвечено на текущее слово (блокируем повторную проверку)
+        let currentWord = null;         // текущий объект слова
+
+        // ----- helpers -----
+        function loadStats() {
+            try {
+                const saved = localStorage.getItem('koreanTestStats');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    stats.correct = parsed.correct || 0;
+                    stats.wrong = parsed.wrong || 0;
+                }
+            } catch (_) { /* ignore */ }
+            updateStatsUI();
+        }
+
+        function saveStats() {
+            localStorage.setItem('koreanTestStats', JSON.stringify(stats));
+        }
+
+        function updateStatsUI() {
+            correctSpan.textContent = stats.correct;
+            wrongSpan.textContent = stats.wrong;
+        }
+
+        // перемешивание (Fisher–Yates)
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // обновить интерфейс прогресса
+        function updateProgressUI() {
+            const total = shuffledWords.length;
+            const done = currentIndex; // сколько уже показано (включая текущий?)
+            // текущий индекс с 0, показываем "номер текущего / всего"
+            const displayIndex = total > 0 ? Math.min(currentIndex + 1, total) : 0;
+            progressIndex.textContent = `${displayIndex} / ${total}`;
+            const remaining = Math.max(0, total - currentIndex - 1);
+            remainingWordsSpan.textContent = `📚 осталось: ${remaining}`;
+        }
+
+        // показать новое слово (по индексу)
+        function displayWord(index) {
+            if (!shuffledWords.length || index >= shuffledWords.length) {
+                // все слова закончились
+                translationDisplay.textContent = '🎉 Все слова пройдены!';
+                koreanInput.value = '';
+                koreanInput.disabled = true;
+                checkBtn.disabled = true;
+                skipBtn.disabled = true;
+                nextBtn.disabled = true;
+                feedbackArea.innerHTML = '🏁 Поздравляем! Вы прошли все слова. Нажмите "Сбросить статистику" чтобы начать заново.';
+                feedbackArea.className = 'feedback';
+                currentWord = null;
+                isAnswered = false;
+                updateProgressUI();
+                return;
+            }
+
+            currentWord = shuffledWords[index];
+            translationDisplay.textContent = currentWord.russian || '😵 нет перевода';
+            koreanInput.value = '';
+            koreanInput.disabled = false;
+            checkBtn.disabled = false;
+            skipBtn.disabled = false;
+            nextBtn.disabled = false;
+            isAnswered = false;
+            feedbackArea.className = 'feedback';
+            feedbackArea.innerHTML = '✏️ Введите корейское слово';
+            koreanInput.focus();
+            updateProgressUI();
+        }
+
+        // загрузить данные из Firebase
+        function loadWordsFromFirebase() {
+            translationDisplay.textContent = '⏳ Загрузка...';
+            feedbackArea.className = 'feedback';
+            feedbackArea.innerHTML = '⏳ Подключаемся к Firebase...';
+
+            fetch(FIREBASE_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data || typeof data !== 'object') {
+                        throw new Error('Некорректный формат данных');
+                    }
+                    // конвертируем объект { id1: { russian, korean }, ... } => массив
+                    const wordsArray = Object.entries(data).map(([id, word]) => {
+                        // защита от отсутствия полей
+                        const russian = word?.russian || '😶‍🌫️';
+                        const korean = word?.korean || '😶';
+                        return { id, russian, korean };
+                    }).filter(w => w.russian && w.korean); // отсеиваем битые
+
+                    if (!wordsArray.length) {
+                        throw new Error('В базе нет слов для изучения');
+                    }
+
+                    allWords = wordsArray;
+                    // перемешиваем и стартуем
+                    shuffledWords = shuffleArray(allWords);
+                    currentIndex = 0;
+                    loadStats(); // загружаем статистику из localStorage
+                    displayWord(0);
+                })
+                .catch(err => {
+                    console.error('Firebase error:', err);
+                    translationDisplay.textContent = '⚠️ Ошибка загрузки';
+                    feedbackArea.className = 'feedback wrong';
+                    feedbackArea.innerHTML = `❌ Не удалось загрузить слова: ${err.message || 'проверьте интернет'}`;
+                    // пробуем загрузить из localStorage резерв (если есть)
+                    const cached = localStorage.getItem('koreanTestWordsCache');
+                    if (cached) {
+                        try {
+                            const cachedWords = JSON.parse(cached);
+                            if (Array.isArray(cachedWords) && cachedWords.length) {
+                                allWords = cachedWords;
+                                shuffledWords = shuffleArray(allWords);
+                                currentIndex = 0;
+                                loadStats();
+                                displayWord(0);
+                                feedbackArea.innerHTML = '📶 Используется кешированная версия слов';
+                                feedbackArea.className = 'feedback';
+                                return;
+                            }
+                        } catch (_) {}
+                    }
+                });
+        }
+
+        // ----- проверка ввода -----
+        function handleCheck() {
+            if (!currentWord) {
+                feedbackArea.className = 'feedback wrong';
+                feedbackArea.innerHTML = '⛔ Слово не загружено';
+                return;
+            }
+            if (isAnswered) {
+                feedbackArea.className = 'feedback';
+                feedbackArea.innerHTML = '⏳ Вы уже ответили. Нажмите "Далее" или "Пропустить"';
+                return;
+            }
+
+            const userInput = koreanInput.value.trim();
+            if (!userInput) {
+                feedbackArea.className = 'feedback wrong';
+                feedbackArea.innerHTML = '✏️ Введите слово перед проверкой';
+                return;
+            }
+
+            const correctKorean = currentWord.korean.trim();
+            // Сравнение без учета регистра (для латиницы) + полное совпадение 
+            // корейские буквы регистронезависимы, но для надежности делаем normalize и сравнение
+            const isCorrect = userInput === correctKorean;
+
+            if (isCorrect) {
+                stats.correct += 1;
+                feedbackArea.className = 'feedback correct';
+                feedbackArea.innerHTML = '✅ Правильно! 🎉';
+            } else {
+                stats.wrong += 1;
+                // подсказка: первая буква правильного слова
+                const hint = correctKorean.charAt(0) || '?';
+                feedbackArea.className = 'feedback wrong';
+                feedbackArea.innerHTML = `❌ Неправильно! Правильный ответ: <strong>${correctKorean}</strong>  <span class="hint-letter">${hint}</span>`;
+            }
+
+            isAnswered = true;
+            saveStats();
+            updateStatsUI();
+            // заблокировать повторную проверку (можно нажать next/skip)
+        }
+
+        // ----- переход к следующему (или пропуск) -----
+        function goToNext() {
+            if (!shuffledWords.length) {
+                // если нет слов, пытаемся перезагрузить?
+                return;
+            }
+            // если не отвечено, считаем как пропуск (не меняем статистику)
+            if (!isAnswered && currentWord) {
+                // пропуск без изменения счета (считаем как пропущенное, но не добавляем wrong)
+                // можно оставить без изменений, но дадим фидбек
+                feedbackArea.className = 'feedback';
+                feedbackArea.innerHTML = `⏭ Пропущено. Правильно: <strong>${currentWord.korean}</strong>`;
+                isAnswered = true; // чтобы не давать проверять
+            }
+
+            // двигаем индекс
+            currentIndex++;
+            if (currentIndex < shuffledWords.length) {
+                displayWord(currentIndex);
+            } else {
+                // конец списка
+                displayWord(currentIndex); // покажет финиш
+            }
+            koreanInput.focus();
+        }
+
+        // ----- пропуск (аналогично next, но без изменения статистики) -----
+        function handleSkip() {
+            if (!currentWord) {
+                return;
+            }
+            if (!isAnswered) {
+                // пропускаем, показываем ответ
+                feedbackArea.className = 'feedback';
+                feedbackArea.innerHTML = `⏭ Пропущено. Правильно: <strong>${currentWord.korean}</strong>`;
+                isAnswered = true;
+                // статистика не меняется
+            }
+            // переходим к следующему
+            currentIndex++;
+            if (currentIndex < shuffledWords.length) {
+                displayWord(currentIndex);
+            } else {
+                displayWord(currentIndex);
+            }
+            koreanInput.focus();
+        }
+
+        // ----- сброс статистики + перетасовка -----
+        function resetStatsAndReshuffle() {
+            stats.correct = 0;
+            stats.wrong = 0;
+            saveStats();
+            updateStatsUI();
+
+            if (allWords.length) {
+                shuffledWords = shuffleArray(allWords);
+                currentIndex = 0;
+                // сброс поля
+                koreanInput.disabled = false;
+                checkBtn.disabled = false;
+                skipBtn.disabled = false;
+                nextBtn.disabled = false;
+                displayWord(0);
+                feedbackArea.className = 'feedback';
+                feedbackArea.innerHTML = '🔄 Сброшено. Начинаем заново!';
+                koreanInput.focus();
+            } else {
+                // если слов нет, пробуем перезагрузить
+                loadWordsFromFirebase();
+            }
+        }
+
+        // ----- инициализация, обработчики -----
+        function init() {
+            // загружаем данные
+            loadWordsFromFirebase();
+
+            // события
+            checkBtn.addEventListener('click', handleCheck);
+            nextBtn.addEventListener('click', goToNext);
+            skipBtn.addEventListener('click', handleSkip);
+
+            // Enter в поле ввода: проверка, если ещё не отвечено, иначе переход
+            koreanInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isAnswered && currentWord) {
+                        handleCheck();
+                    } else {
+                        // если уже отвечено или нет слова - переходим
+                        goToNext();
+                    }
+                }
+            });
+
+            resetBtn.addEventListener('click', resetStatsAndReshuffle);
+
+            // при фокусе на поле, если не загружено - ничего
+            koreanInput.addEventListener('focus', () => {
+                if (!currentWord && shuffledWords.length) {
+                    // попытка восстановить
+                }
+            });
+
+            // кеширование слов после загрузки для оффлайн
+            // сохраняем в localStorage при успешной загрузке (в loadWordsFromFirebase)
+            const originalLoad = loadWordsFromFirebase;
+            loadWordsFromFirebase = function() {
+                fetch(FIREBASE_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        const wordsArray = Object.entries(data).map(([id, word]) => ({
+                            id,
+                            russian: word?.russian || '😶‍🌫️',
+                            korean: word?.korean || '😶'
+                        })).filter(w => w.russian && w.korean);
+                        if (wordsArray.length) {
+                            localStorage.setItem('koreanTestWordsCache', JSON.stringify(wordsArray));
+                        }
+                        // вызываем оригинальную логику через замыкание
+                        // но мы уже переопределили, поэтому вызываем рекурсивно? нет.
+                        // проще сделать повторно.
+                        allWords = wordsArray;
+                        shuffledWords = shuffleArray(allWords);
+                        currentIndex = 0;
+                        loadStats();
+                        displayWord(0);
+                        feedbackArea.className = 'feedback';
+                        feedbackArea.innerHTML = '✅ Данные загружены!';
+                    })
+                    .catch(() => {
+                        // fallback
+                        const cached = localStorage.getItem('koreanTestWordsCache');
+                        if (cached) {
+                            try {
+                                const cachedWords = JSON.parse(cached);
+                                if (Array.isArray(cachedWords) && cachedWords.length) {
+                                    allWords = cachedWords;
+                                    shuffledWords = shuffleArray(allWords);
+                                    currentIndex = 0;
+                                    loadStats();
+                                    displayWord(0);
+                                    feedbackArea.className = 'feedback';
+                                    feedbackArea.innerHTML = '📶 Кешированные слова (офлайн)';
+                                    return;
+                                }
+                            } catch (_) {}
+                        }
+                        translationDisplay.textContent = '⚠️ Ошибка загрузки';
+                        feedbackArea.className = 'feedback wrong';
+                        feedbackArea.innerHTML = '❌ Нет интернета и нет кеша';
+                    });
+            };
+            // переопределим, чтобы при инициализации использовалась новая версия
+            // и вызовем
+            loadWordsFromFirebase();
+        }
+
+        // дополнительно: переопределим displayWord чтобы обрабатывать случаи пустого массива
+        const originalDisplay = displayWord;
+        displayWord = function(index) {
+            if (!shuffledWords.length) {
+                translationDisplay.textContent = '📭 Нет слов для отображения';
+                koreanInput.disabled = true;
+                checkBtn.disabled = true;
+                skipBtn.disabled = true;
+                nextBtn.disabled = true;
+                feedbackArea.className = 'feedback';
+                feedbackArea.innerHTML = '⏳ Загрузите слова заново';
+                return;
+            }
+            originalDisplay(index);
+        };
+
+        // запуск
+        init();
+    })();
+</script>
+</body>
+</html>
